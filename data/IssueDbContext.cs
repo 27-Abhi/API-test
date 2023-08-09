@@ -10,7 +10,7 @@ namespace trackingapi.data
         {
 
         }
-        public DbSet<issue> Issues { get; set; } //representattion of the table in the database...helps us manipulate database
+        public DbSet<Issue> Issues { get; set; } //representattion of the table in the database...helps us manipulate database
 
     }
 }
