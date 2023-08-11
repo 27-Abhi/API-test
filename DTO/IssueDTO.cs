@@ -1,25 +1,30 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.Runtime.Serialization;
 using System.Text.Json.Serialization;
+using trackingapi.Models;
 
-namespace trackingapi.Models
+namespace trackingapi.DTO
 {
-    public class Issue
+    public class IssueDTO : Issue
     {
         public int Id { get; set; }
         [Required]
         public string Title { get; set; }
         [Required]
         public string Description { get; set; }
-        public Priority priority { get; set; }
-        
-
-        public IssueType IssueType { get; set; }
-
-        public DateTime created { get; set; }
-        public DateTime Completed { get; set; }
+        public Models.IssueType IssueType { get; internal set; }
+        // public Priority priority { get; set; }
 
 
+        //  public IssueType IssueType { get; set; }
+
+
+
+    }
+
+    public class IssueFilter : FilterDTO
+    {
+        public IssueType Type { get; set; }
     }
 
 

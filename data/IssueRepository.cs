@@ -5,6 +5,9 @@ using trackingapi.data;
 using trackingapi.Models;
 using trackingapi.Service;
 using System.Collections.Generic;
+using trackingapi.DTO;
+using System.Linq.Expressions;
+using trackingapi.Methods;
 
 namespace trackingapi.data
 {
@@ -27,16 +30,31 @@ namespace trackingapi.data
             return true;
         }
 
-        public async Task<List<Issue>> FilterReq(FilterRequest filterRequest)
+        public async Task<List<Issue>> FilterReq(FilterDTO filterRequest)
         {
             var tot_num = await _context.Issues
                                .CountAsync(issue => issue.IssueType == filterRequest.Type);
+            var issues = new List<Issue>();
 
-            var issues = await _context.Issues
-                .Where(issue => issue.IssueType == filterRequest.Type)
+
+                if (filterRequest.Sort == "desc") //sorting 
+            {
+                issues= await _context.Issues
+                .Where(issue => issue.IssueType == filterRequest.Type )
+                .OrderByDescending(a=>a.IssueType)
                 .Skip((filterRequest.Page - 1) * filterRequest.Num)
                 .Take(filterRequest.Num)
                 .ToListAsync();
+            }
+                else
+            {
+                issues = await _context.Issues
+                .Where(issue => issue.IssueType == filterRequest.Type)
+                .OrderBy(a=>a.IssueType)
+                .Skip((filterRequest.Page - 1) * filterRequest.Num)
+                .Take(filterRequest.Num)
+                .ToListAsync();
+            }
 
 
 
@@ -58,32 +76,63 @@ namespace trackingapi.data
             return await _context.Issues.FindAsync(id);
         }
 
-        public Task<Issue> Post(Issue issue)
+        public Task<Issue> Post(IssueDTO issue)
         {
             throw new NotImplementedException();
         }
 
-        public async Task<bool> PostIssue(Issue issue)
+        public async Task<bool> PostIssue(IssueDTO issue)
         {
-            await _context.AddAsync(issue);
-            // await _context.Insert
-            await _context.SaveChangesAsync();
+            var check = await TitleValidator.Validating(issue.Title, _context, issue.Id);
 
-            return true;
+            if (check == true)
+            {
+                throw new InvalidOperationException("Title Already exists");
+            }
+            else
+            {
+                //exception handling for same issuetype not being present more than 3 times
+                var count = await _context.Issues
+                                  .CountAsync(i => i.IssueType == issue.IssueType);
+                if (count >= 3)
+                {
+                    throw new InvalidOperationException("Issue Type already already exists more than 3 times.");
+
+                }
+
+                else
+                {
+
+                    await _context.AddAsync(issue);
+                    // await _context.Insert
+                    await _context.SaveChangesAsync();
+
+                    return true;
+                }
+            }
+
         }
 
-        public Task<Issue> Put(Issue issue)
+        public Task<Issue> Put(IssueDTO issue)
         {
             throw new NotImplementedException();
         }
 
-        public async Task<bool> PutIssue(int id, Issue issue)
+        public async Task<bool> PutIssue(int id, IssueDTO issue)
         {
-            _context.Entry(issue).State = EntityState.Modified;
-            await _context.SaveChangesAsync();
+            var check = await TitleValidator.Validating(issue.Title, _context, issue.Id);
+            if (check == true)
+            {
+                throw new InvalidOperationException("Same title already exists");
 
-            return true;
+            }
+            else
+            {
+                _context.Entry(issue).State = EntityState.Modified;
+                await _context.SaveChangesAsync();
 
+                return true;
+            }
         }
 
 
@@ -92,5 +141,9 @@ namespace trackingapi.data
         {
             throw new NotImplementedException();
         }
+
+
+     
+
     }
 }

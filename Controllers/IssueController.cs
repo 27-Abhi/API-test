@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using trackingapi.data;
+using trackingapi.DTO;
 using trackingapi.Models;
 using trackingapi.Service;
 
@@ -21,14 +22,14 @@ namespace trackingapi.Controllers
 
 
         [HttpGet]
-        public async Task<IEnumerable<Issue>> Get()
+        public async Task<IEnumerable<IssueDTO>> Get()
         {
           //  await _iIssueService.GetAll();
-            return (IEnumerable<Issue>)await _iIssueService.GetAll();
+            return (IEnumerable<IssueDTO>)await _iIssueService.GetAll();
         }   //=> //await _context.Issues.ToListAsync();
 
         [HttpGet("id")]
-        [ProducesResponseType(typeof(Issue), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(IssueDTO), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<IActionResult> GetById(int id)
         {
@@ -39,8 +40,11 @@ namespace trackingapi.Controllers
 
         [HttpPost]
         [ProducesResponseType(StatusCodes.Status201Created)]
-        public async Task<IActionResult> Create(Issue issue)
+        public async Task<IActionResult> Create(IssueDTO issue)
         {
+
+
+
             //await _iIssueService.AddAsync(issue);
             // await _iIssueService.SaveChangesAsync();
 
@@ -51,7 +55,7 @@ namespace trackingapi.Controllers
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
 
-        public async Task<IActionResult> update(int id, Issue issue)
+        public async Task<IActionResult> update(int id, IssueDTO issue)
         {
             if (id != issue.Id) return BadRequest(); //if mismatch between id in the url and id in the body then return bad req
 
@@ -86,9 +90,9 @@ namespace trackingapi.Controllers
 
         }
         //pageination
-        [HttpPost("filtered-issues")] //page-which page to display; num-how many elements to display;type-the type of issue
+        [HttpPost("filteredissues")] //page-which page to display; num-how many elements to display;type-the type of issue
         [ProducesResponseType(StatusCodes.Status200OK)]
-        public async Task<List<Issue>> Test(FilterRequest filterRequest)
+        public async Task<List<Issue>> Test(FilterDTO filterRequest)
         {
 
 

@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using trackingapi.data;
+using trackingapi.DTO;
 using trackingapi.Models;
 
 namespace trackingapi.Service
@@ -30,7 +31,7 @@ namespace trackingapi.Service
             throw new NotImplementedException();
         }
 
-        public async Task<List<Issue>> FilterReq(FilterRequest filterRequest)
+        public async Task<List<Issue>> FilterReq(FilterDTO filterRequest)
         {
             return await _iIssueRepository.FilterReq(filterRequest);
         }
@@ -44,18 +45,30 @@ namespace trackingapi.Service
         {
             return await _iIssueRepository.GetAll();
         }
-
-        public async Task<Issue> GetIssue(int id)
+            
+        public async Task<IssueDTO> GetIssue(int id)
         {
-            return await _iIssueRepository.GetIssue(id);
+            var issue = await _iIssueRepository.GetIssue(id);
+
+            var issueDTO = new IssueDTO //mapper
+            {
+                Id = issue.Id,
+                Title = issue.Title,
+                Description = issue.Description,
+
+
+            };
+            return issueDTO;
+           // var response ///figure this out...mappiijng issue to issue DTO...to presentable data
+             //   return response;
         }
 
-        public async Task<bool> PostIssue(Issue issue)
+        public async Task<bool> PostIssue(IssueDTO issue)
         {
             return await _iIssueRepository.PostIssue(issue);
         }
 
-        public async Task<bool> PutIssue(int id, Issue issue)
+        public async Task<bool> PutIssue(int id, IssueDTO issue)
         {
             return await _iIssueRepository.PutIssue(id,issue);
         }
